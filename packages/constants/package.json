@@ -3,10 +3,23 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js"
+      "types": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "check-types": "tsc --noEmit --project tsconfig.json"
+  },
+  "devDependencies": {
+    "@ibase/typescript-config": "workspace:*",
+    "typescript": "catalog:"
   }
 }

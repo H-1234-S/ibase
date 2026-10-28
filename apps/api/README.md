@@ -26,5 +26,5 @@ Use `pnpm --filter api db:studio` to open Drizzle Studio.
 ## Run the API
 
 ```sh
-pnpm --filter api dev
+pnpm dev --filter=api
 ```

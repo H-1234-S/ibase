@@ -42,4 +42,6 @@ PostgreSQL is available at `localhost:5432`; Redis is available at `localhost:63
 
 The root `.prettierrc` is the formatting source for the whole repository. Shared tool versions are declared in `pnpm-workspace.yaml`'s catalog.
 
+`@ibase/constants` is TypeScript source compiled by Turborepo before dependent apps build or start.
+
 To add shadcn/ui components, run the shadcn CLI from `packages/ui`; import shared components from `@ibase/ui/components/ui/...` in either Next.js app.
