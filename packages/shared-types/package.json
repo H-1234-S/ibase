@@ -1,0 +1,18 @@
+{
+  "name": "@ibase/shared-types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "@ibase/typescript-config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
