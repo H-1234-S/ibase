@@ -14,6 +14,7 @@
     "@ibase/constants": "workspace:*",
     "@ibase/shared-types": "workspace:*",
     "@ibase/ui": "workspace:*",
+    "@tanstack/react-form": "^1.33.5",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -21,10 +22,10 @@
   "devDependencies": {
     "@ibase/eslint-config": "workspace:*",
     "@ibase/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "catalog:",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
-    "@tailwindcss/postcss": "catalog:",
     "eslint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"

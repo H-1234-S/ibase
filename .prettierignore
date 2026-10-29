@@ -8,3 +8,5 @@ coverage/
 pnpm-lock.yaml
 *.tsbuildinfo
 .agents/
+drizzle/
+.vscode

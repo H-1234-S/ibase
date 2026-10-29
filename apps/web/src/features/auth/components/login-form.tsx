@@ -11,7 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@ibase/ui/components/ui/card';
-import { ApiRequestError, authRequest } from '../api/auth-api';
+import { toast } from '@ibase/ui/components/ui/sonner';
+import {
+  ApiRequestError,
+  authRequest,
+  getApiErrorMessage,
+} from '../api/auth-api';
 import { broadcastAuthChange } from './broadcast-auth-change';
 import { useAuth } from '../hooks/use-auth';
 import type { PublicUser } from '@ibase/shared-types';
@@ -24,13 +29,11 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [passwordError, setPasswordError] = useState('');
-  const [message, setMessage] = useState('');
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setPasswordError('');
-    setMessage('');
 
     try {
       const result = await authRequest<{ user: PublicUser }>(
@@ -42,21 +45,32 @@ export function LoginForm() {
       );
       setUser(result.user);
       broadcastAuthChange();
-      router.replace('/');
+      const nextPath = new URLSearchParams(window.location.search).get('next');
+      router.replace(
+        nextPath?.startsWith('/') && !nextPath.startsWith('//')
+          ? nextPath
+          : '/',
+      );
     } catch (error) {
+      // Field-level errors stay inline; everything else surfaces as a
+      // bottom-right toast so failures are never silent.
       if (
         error instanceof ApiRequestError &&
         error.code === 'EMAIL_NOT_REGISTERED'
       ) {
-        setMessage('该邮箱尚未注册');
-        window.alert('该邮箱尚未注册');
+        toast.error('该邮箱尚未注册', {
+          action: {
+            label: '前往注册',
+            onClick: () => router.push('/register'),
+          },
+        });
       } else if (
         error instanceof ApiRequestError &&
         error.code === 'INVALID_PASSWORD'
       ) {
         setPasswordError('密码不正确');
       } else {
-        setMessage('登录失败，请稍后重试');
+        toast.error(getApiErrorMessage(error, '登录失败，请稍后重试。'));
       }
     } finally {
       setBusy(false);
@@ -101,16 +115,6 @@ export function LoginForm() {
                 </span>
               )}
             </label>
-            {message && (
-              <div className="space-y-2 text-sm text-destructive" role="alert">
-                <p>{message}</p>
-                {message === '该邮箱尚未注册' && (
-                  <Link className="text-primary underline" href="/register">
-                    前往注册
-                  </Link>
-                )}
-              </div>
-            )}
             <Button className="w-full" disabled={busy} type="submit">
               {busy ? '登录中…' : '登录'}
             </Button>

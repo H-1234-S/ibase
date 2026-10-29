@@ -11,6 +11,23 @@ import { DatabaseService } from '../src/database/database.service.js';
 import { users } from '../src/database/schemas/index.js';
 import { inArray } from 'drizzle-orm';
 
+function getRootCookie(setCookies: string[], name: string) {
+  const cookie = setCookies.find(
+    (value) => value.startsWith(`${name}=`) && value.includes('Path=/;'),
+  );
+  if (!cookie) throw new Error(`${name} cookie was not set`);
+  const pair = cookie.split(';')[0];
+  if (!pair) throw new Error(`${name} cookie value was empty`);
+  return pair;
+}
+
+function getAuthCookieHeader(setCookies: string[]) {
+  return [
+    getRootCookie(setCookies, 'ibase_at'),
+    getRootCookie(setCookies, 'ibase_rt'),
+  ].join('; ');
+}
+
 describe('Authentication session flow (e2e)', () => {
   let app: INestApplication<App>;
   let verificationCode = '';
@@ -58,21 +75,20 @@ describe('Authentication session flow (e2e)', () => {
   });
 
   it('registers, refreshes, revokes on logout, and rejects the old refresh token', async () => {
-    const agent = request.agent(app.getHttpServer());
-    await agent
+    await request(app.getHttpServer())
       .post('/api/auth/email/send-code')
       .set(originHeaders)
       .send({ email })
       .expect(200);
     expect(verificationCode).toMatch(/^\d{6}$/);
 
-    const registration = await agent
+    const registration = await request(app.getHttpServer())
       .post('/api/auth/register')
       .set(originHeaders)
       .send({
         name: 'Auth Test',
         email,
-        password: 'a-secure-test-password',
+        password: 'secure-pass-123',
         code: verificationCode,
       })
       .expect(201);
@@ -87,24 +103,30 @@ describe('Authentication session flow (e2e)', () => {
     const refreshCookie = setCookies.find((cookie) =>
       cookie.startsWith('ibase_rt='),
     );
-    expect(accessCookie).toContain('Path=/api;');
-    expect(refreshCookie).toContain('Path=/api/auth;');
+    expect(accessCookie).toContain('Path=/;');
+    expect(refreshCookie).toContain('Path=/;');
     expect(setCookies.join(';')).toContain('HttpOnly');
 
-    const oldRefreshCookie = setCookies.find((cookie) =>
-      cookie.startsWith('ibase_rt='),
-    );
-    if (!oldRefreshCookie) {
-      throw new Error('Refresh cookie was not set');
-    }
-    const oldRefreshCookieValue = oldRefreshCookie.split(';')[0];
-    if (!oldRefreshCookieValue) {
-      throw new Error('Refresh cookie value was empty');
-    }
+    const oldRefreshCookieValue = getRootCookie(setCookies, 'ibase_rt');
+    const sessionCookie = getAuthCookieHeader(setCookies);
 
-    await agent.get('/api/auth/me').expect(200);
-    await agent.post('/api/auth/refresh').set(originHeaders).expect(200);
-    await agent.post('/api/auth/logout').set(originHeaders).expect(204);
+    await request(app.getHttpServer())
+      .get('/api/auth/me')
+      .set('Cookie', sessionCookie)
+      .expect(200);
+    const refreshed = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set(originHeaders)
+      .set('Cookie', sessionCookie)
+      .expect(200);
+    const rotatedCookie = getAuthCookieHeader(
+      refreshed.get('Set-Cookie') ?? [],
+    );
+    await request(app.getHttpServer())
+      .post('/api/auth/logout')
+      .set(originHeaders)
+      .set('Cookie', rotatedCookie)
+      .expect(204);
 
     const replay = await request(app.getHttpServer())
       .post('/api/auth/refresh')
@@ -113,7 +135,7 @@ describe('Authentication session flow (e2e)', () => {
       .expect(401);
     expect(replay.body.error.code).toBe('UNAUTHENTICATED');
 
-    await agent.get('/api/auth/me').expect(401);
+    await request(app.getHttpServer()).get('/api/auth/me').expect(401);
 
     const duplicate = await request(app.getHttpServer())
       .post('/api/auth/register')
@@ -121,39 +143,40 @@ describe('Authentication session flow (e2e)', () => {
       .send({
         name: 'Duplicate User',
         email,
-        password: 'a-secure-test-password',
+        password: 'secure-pass-123',
         code: '000000',
       })
       .expect(409);
     expect(duplicate.body.error.code).toBe('EMAIL_ALREADY_REGISTERED');
 
-    const login = request.agent(app.getHttpServer());
-    const loginResponse = await login
+    const loginResponse = await request(app.getHttpServer())
       .post('/api/auth/login')
       .set(originHeaders)
-      .send({ email, password: 'a-secure-test-password' })
+      .send({ email, password: 'secure-pass-123' })
       .expect(200);
     expect(loginResponse.body.data.user.email).toBe(email);
-    await login.get('/api/auth/me').expect(200);
+    await request(app.getHttpServer())
+      .get('/api/auth/me')
+      .set('Cookie', getAuthCookieHeader(loginResponse.get('Set-Cookie') ?? []))
+      .expect(200);
 
     const wrongPassword = await request(app.getHttpServer())
       .post('/api/auth/login')
       .set(originHeaders)
-      .send({ email, password: 'a-different-password' })
+      .send({ email, password: 'different-pass-123' })
       .expect(401);
     expect(wrongPassword.body.error.code).toBe('INVALID_PASSWORD');
   });
 
   it('rejects a consumed registration code', async () => {
     const unusedEmail = `auth-${randomUUID()}@example.test`;
-    const agent = request.agent(app.getHttpServer());
-    const registration = await agent
+    const registration = await request(app.getHttpServer())
       .post('/api/auth/register')
       .set(originHeaders)
       .send({
         name: 'Auth Test',
         email: unusedEmail,
-        password: 'a-secure-test-password',
+        password: 'secure-pass-123',
         code: verificationCode,
       })
       .expect(400);
@@ -170,36 +193,39 @@ describe('Authentication session flow (e2e)', () => {
       .send({ email: replayEmail })
       .expect(200);
     const replayCode = verificationCode;
-    const agent = request.agent(app.getHttpServer());
-    const registration = await agent
+    const registration = await request(app.getHttpServer())
       .post('/api/auth/register')
       .set(originHeaders)
       .send({
         name: 'Replay Test',
         email: replayEmail,
-        password: 'a-secure-test-password',
+        password: 'secure-pass-123',
         code: replayCode,
       })
       .expect(201);
-    const originalRefreshCookie = registration
-      .get('Set-Cookie')
-      ?.find((cookie) => cookie.startsWith('ibase_rt='));
-    if (!originalRefreshCookie) {
-      throw new Error('Refresh cookie was not set');
-    }
-    const originalRefreshCookieValue = originalRefreshCookie.split(';')[0];
-    if (!originalRefreshCookieValue) {
-      throw new Error('Refresh cookie value was empty');
-    }
-
-    await agent.post('/api/auth/refresh').set(originHeaders).expect(200);
+    const originalRefreshCookieValue = getRootCookie(
+      registration.get('Set-Cookie') ?? [],
+      'ibase_rt',
+    );
+    const refreshResult = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set(originHeaders)
+      .set('Cookie', originalRefreshCookieValue)
+      .expect(200);
     const replay = await request(app.getHttpServer())
       .post('/api/auth/refresh')
       .set(originHeaders)
       .set('Cookie', originalRefreshCookieValue)
       .expect(401);
     expect(replay.body.error.code).toBe('UNAUTHENTICATED');
-    await agent.post('/api/auth/refresh').set(originHeaders).expect(401);
+    await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set(originHeaders)
+      .set(
+        'Cookie',
+        getRootCookie(refreshResult.get('Set-Cookie') ?? [], 'ibase_rt'),
+      )
+      .expect(401);
   });
 
   it('applies the documented security-first policy to concurrent refreshes', async () => {
@@ -218,7 +244,7 @@ describe('Authentication session flow (e2e)', () => {
       .send({
         name: 'Concurrent Refresh',
         email: concurrentEmail,
-        password: 'a-secure-test-password',
+        password: 'secure-pass-123',
         code,
       })
       .expect(201);

@@ -120,13 +120,21 @@ export class AuthController {
 
     response.cookie(this.auth.cookieNames.access, tokens.accessToken, {
       ...common,
-      path: '/api',
+      path: '/',
       maxAge: settings.accessTtl * 1000,
     });
     response.cookie(this.auth.cookieNames.refresh, tokens.refreshToken, {
       ...common,
-      path: '/api/auth',
+      path: '/',
       maxAge: Math.max(0, tokens.refreshExpiresAt.getTime() - Date.now()),
+    });
+    response.clearCookie(this.auth.cookieNames.access, {
+      ...common,
+      path: '/api',
+    });
+    response.clearCookie(this.auth.cookieNames.refresh, {
+      ...common,
+      path: '/api/auth',
     });
   }
 
@@ -139,6 +147,14 @@ export class AuthController {
       ...(settings.domain ? { domain: settings.domain } : {}),
     } as const;
 
+    response.clearCookie(this.auth.cookieNames.access, {
+      ...common,
+      path: '/',
+    });
+    response.clearCookie(this.auth.cookieNames.refresh, {
+      ...common,
+      path: '/',
+    });
     response.clearCookie(this.auth.cookieNames.access, {
       ...common,
       path: '/api',

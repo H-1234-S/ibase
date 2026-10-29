@@ -9,6 +9,14 @@ export interface ApiErrorResponse {
     code: string;
     message: string;
     requestId: string;
+    validationErrors?: ApiValidationError[];
+    /** Legacy validation payload emitted by API instances running the previous contract. */
     fields?: string[];
   };
+}
+
+/** Stable field and constraint identifiers returned for request validation failures. */
+export interface ApiValidationError {
+  field: string;
+  rule: string;
 }

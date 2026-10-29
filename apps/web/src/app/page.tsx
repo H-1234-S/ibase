@@ -33,8 +33,12 @@ export default async function Home() {
   const isAvailable = health?.status === 'ok';
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
-      <div className="w-full max-w-2xl space-y-8">
+    <main className="flex flex-col min-h-screen bg-background gap-4 py-4 px-6 text-foreground">
+      <div className="flex items-center justify-between">
+        <p>ibase</p>
+        <AuthStatus />
+      </div>
+      <div className="w-full max-w-2xl space-y-8 flex flex-col">
         <header className="space-y-2">
           <h1 className="text-sm font-medium text-muted-foreground">
             {APP_NAME}
@@ -42,7 +46,6 @@ export default async function Home() {
           <p className="text-muted-foreground">
             查看 API 服务和数据库是否可用。
           </p>
-          <AuthStatus />
         </header>
 
         <Card>

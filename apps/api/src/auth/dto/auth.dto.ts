@@ -26,8 +26,8 @@ export class RegisterDto extends SendEmailCodeDto {
   name!: string;
 
   @IsString()
-  @MinLength(12)
-  @MaxLength(128)
+  @MinLength(8)
+  @MaxLength(20)
   password!: string;
 
   @IsString()
