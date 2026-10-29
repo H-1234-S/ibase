@@ -9,6 +9,17 @@ Read `docs/README.md` inside that installed package first, then read the relevan
 This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": true` in the root `turbo.json` or `turbo.jsonc` to opt in; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
 <!-- END:turborepo-agent-rules -->
 
+# Design System
+
+Before writing or modifying any UI code, read `DESIGN.md` in the project root.
+Treat it as the visual source of truth for all frontend work.
+Use its color tokens, typography scale, spacing rules, component styles, and do/don’t guidance exactly as specified.
+Do not invent colors, fonts, or spacing values outside of `DESIGN.md`.
+
+# UI Components
+
+Use existing components from `@ibase/ui` first when building UI. If a needed component is not available, add the corresponding shadcn/ui component to `packages/ui` and use it from there before building a custom component. Follow `DESIGN.md` when adapting shadcn/ui styles.
+
 <!-- GENERAL CODING GUIDELINES START -->
 
 # Jo's Thought Imprint

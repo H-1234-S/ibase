@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const ACCESS_COOKIE = 'ibase_at';
 const REFRESH_COOKIE = 'ibase_rt';
-const PUBLIC_PATHS = new Set(['/', '/login', '/register']);
+const PUBLIC_PATHS = new Set([
+  '/',
+  '/login',
+  '/register',
+  '/service-unavailable',
+]);
 
 /** Protects app routes and refreshes expired sessions before rendering pages. */
 export default async function proxy(request: NextRequest) {
@@ -10,42 +15,62 @@ export default async function proxy(request: NextRequest) {
   if (pathname.startsWith('/api') || pathname.startsWith('/_next')) {
     return NextResponse.next();
   }
+  if (pathname === '/service-unavailable') {
+    return NextResponse.next();
+  }
 
-  const isPublicPath = PUBLIC_PATHS.has(pathname);
+  const isInvitationPath = pathname.startsWith('/invitations/');
+  const isPublicPath = PUBLIC_PATHS.has(pathname) || isInvitationPath;
   const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
   const apiBaseUrl = process.env.API_BASE_URL ?? 'http://localhost:3001';
   let authenticated = false;
   let refreshedCookies: string[] = [];
 
-  if (accessToken) {
-    const response = await fetch(new URL('/api/auth/me', apiBaseUrl), {
-      headers: { cookie: tokenCookieHeader(accessToken) },
-      cache: 'no-store',
-      signal: AbortSignal.timeout(5000),
+  try {
+    if (accessToken) {
+      const response = await fetch(new URL('/api/auth/me', apiBaseUrl), {
+        headers: { cookie: tokenCookieHeader(accessToken) },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
+      });
+      authenticated = response.ok;
+    }
+
+    if (!authenticated && refreshToken) {
+      const response = await fetch(new URL('/api/auth/refresh', apiBaseUrl), {
+        method: 'POST',
+        headers: {
+          cookie: tokenCookieHeader(accessToken, refreshToken),
+          origin: request.nextUrl.origin,
+          'x-ibase-request': '1',
+        },
+        cache: 'no-store',
+        redirect: 'manual',
+        signal: AbortSignal.timeout(5000),
+      });
+      refreshedCookies = response.headers.getSetCookie();
+      authenticated = response.ok;
+    }
+  } catch {
+    if (pathname === '/') {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL('/service-unavailable', request.url), {
+      status: 307,
     });
-    authenticated = response.ok;
   }
 
-  if (!authenticated && refreshToken) {
-    const response = await fetch(new URL('/api/auth/refresh', apiBaseUrl), {
-      method: 'POST',
-      headers: {
-        cookie: tokenCookieHeader(accessToken, refreshToken),
-        origin: request.nextUrl.origin,
-        'x-ibase-request': '1',
-      },
-      cache: 'no-store',
-      redirect: 'manual',
-      signal: AbortSignal.timeout(5000),
-    });
-    refreshedCookies = response.headers.getSetCookie();
-    authenticated = response.ok;
-  }
-
-  if (isPublicPath && authenticated) {
+  if (PUBLIC_PATHS.has(pathname) && authenticated) {
+    const nextPath = request.nextUrl.searchParams.get('next');
+    const redirectPath =
+      (pathname === '/login' || pathname === '/register') &&
+      nextPath?.startsWith('/invitations/') &&
+      !nextPath.startsWith('//')
+        ? nextPath
+        : '/dashboard';
     return withCookies(
-      NextResponse.redirect(new URL('/dashboard', request.url)),
+      NextResponse.redirect(new URL(redirectPath, request.url)),
       refreshedCookies,
     );
   }
@@ -59,7 +84,11 @@ export default async function proxy(request: NextRequest) {
     return withCookies(NextResponse.redirect(loginUrl), refreshedCookies);
   }
 
-  return withCookies(NextResponse.next(), refreshedCookies);
+  const response = NextResponse.next();
+  if (isInvitationPath) {
+    response.headers.set('Referrer-Policy', 'no-referrer');
+  }
+  return withCookies(response, refreshedCookies);
 }
 
 function tokenCookieHeader(accessToken?: string, refreshToken?: string) {

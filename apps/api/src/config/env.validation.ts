@@ -92,6 +92,15 @@ export function validateEnvironment(environment: Record<string, unknown>) {
     throw new Error('EMAIL_USER and EMAIL_PASSWORD must be configured');
   }
 
+  const invitationSecret = environmentString(
+    environment.INVITATION_TOKEN_SECRET,
+    '',
+    'INVITATION_TOKEN_SECRET',
+  );
+  if (Buffer.byteLength(invitationSecret) < 32) {
+    throw new Error('INVITATION_TOKEN_SECRET must contain at least 32 bytes');
+  }
+
   if (!['lax', 'strict', 'none'].includes(sameSite)) {
     throw new Error('AUTH_COOKIE_SAME_SITE must be lax, strict, or none');
   }
@@ -176,6 +185,12 @@ export function validateEnvironment(environment: Record<string, unknown>) {
     ),
     AUTH_COOKIE_SECURE: cookieSecure,
     AUTH_COOKIE_SAME_SITE: sameSite,
+    INVITATION_TOKEN_SECRET: invitationSecret,
+    INVITATION_TTL_HOURS: positiveInteger(
+      environment.INVITATION_TTL_HOURS,
+      168,
+      'INVITATION_TTL_HOURS',
+    ),
   };
 }
 

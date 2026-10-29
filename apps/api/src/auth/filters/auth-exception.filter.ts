@@ -38,16 +38,21 @@ export class AuthExceptionFilter implements ExceptionFilter {
         typeof body === 'object' && body !== null
           ? (body as Record<string, unknown>)
           : {};
+      if (typeof details.retryAfter === 'number') {
+        response.setHeader('Retry-After', details.retryAfter);
+      }
       const code =
-        status === HttpStatus.TOO_MANY_REQUESTS
-          ? 'RATE_LIMITED'
-          : status === HttpStatus.FORBIDDEN
-            ? 'FORBIDDEN'
-            : status === HttpStatus.UNAUTHORIZED
-              ? 'UNAUTHENTICATED'
-              : status === HttpStatus.BAD_REQUEST
-                ? 'VALIDATION_ERROR'
-                : 'INTERNAL_SERVER_ERROR';
+        typeof details.code === 'string'
+          ? details.code
+          : status === HttpStatus.TOO_MANY_REQUESTS
+            ? 'RATE_LIMITED'
+            : status === HttpStatus.FORBIDDEN
+              ? 'FORBIDDEN'
+              : status === HttpStatus.UNAUTHORIZED
+                ? 'UNAUTHENTICATED'
+                : status === HttpStatus.BAD_REQUEST
+                  ? 'VALIDATION_ERROR'
+                  : 'INTERNAL_SERVER_ERROR';
 
       response.status(status).json({
         error: {

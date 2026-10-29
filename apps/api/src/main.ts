@@ -15,7 +15,7 @@ async function bootstrap() {
   app.enableCors({
     origin: app.get(ConfigService).getOrThrow<string>('WEB_ORIGIN'),
     credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'X-Ibase-Request'],
   });
   app.useGlobalFilters(new AuthExceptionFilter());

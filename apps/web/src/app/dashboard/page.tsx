@@ -1,10 +1,5 @@
-import { AuthStatus } from '../../features/auth/components/auth-status';
+import { DashboardPage } from '../../features/organizations/components/dashboard-page';
 
-export default function Home() {
-  return (
-    <>
-      <h1>dashboard</h1>
-      <AuthStatus />
-    </>
-  );
+export default function Page() {
+  return <DashboardPage />;
 }

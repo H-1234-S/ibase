@@ -12,8 +12,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'ibase Docs',
-  description: 'Documentation for ibase',
+  title: 'ibase 项目文档',
+  description: 'ibase monorepo 应用、共享包和本地开发文档',
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>
