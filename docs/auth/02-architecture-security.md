@@ -31,13 +31,13 @@ Access、Refresh Token 仅通过 HttpOnly Cookie 传输，不出现在 JSON、We
 
 Cookie 认证须有 CSRF 防护，CORS 本身不构成防护。建议对有副作用的方法校验精确 Origin（必要时 Referer）并配合 CSRF Token/自定义请求头；不得只依赖 SameSite。API CORS 必须限制为配置的 Web Origin 并允许 credentials，禁止 `*` 与 credentials 并用。
 
-推荐收紧 Cookie Path：Access Cookie 为 `/api`；Refresh Cookie 仅用于 `/api/auth/refresh`（或兼容清除时一致的受限路径）。设置与 Token 生命周期相符的有效期。若采用 `__Host-` 前缀，Cookie 必须 Secure、Path `/` 且不含 Domain，因此与最小 Path 目标冲突；首版建议不使用该前缀。
+推荐收紧 Cookie Path：Access Cookie 为 `/api`；Refresh Cookie 使用 `/api/auth`，以便 refresh 和 logout 都能读取并撤销会话。设置与 Token 生命周期相符的有效期。若采用 `__Host-` 前缀，Cookie 必须 Secure、Path `/` 且不含 Domain，因此与最小 Path 目标冲突；首版建议不使用该前缀。
 
 ## 5. 邮箱验证码与跨存储一致性
 
 验证码由安全随机源生成，Redis 仅保存验证码摘要或采用限制 Redis 访问权限的受控存储，TTL 固定 300 秒。按规范化邮箱构造 key，使用 Lua/原子命令实现冷却、尝试计数与“校验并消费”。建议发送冷却 60 秒、每邮箱每小时最多 5 次、每 IP 每小时最多 20 次；验证码错误最多 5 次后失效（参数化配置，具体值待审核）。
 
-邮件发送流程先占用一个有短 TTL 的发送锁/限流名额，再发信；失败时按原子方式删除临时验证码并释放或保留适当冷却名额，避免攻击者利用失败重置限流。只有发送成功才把验证码作为可验证状态发布。需实现 Lua 或等效可靠流程，不能假设 Redis 与 PostgreSQL 存在跨库事务。
+邮件发送流程先占用一个有短 TTL 的发送锁/限流名额，再发信；失败时删除临时验证码并保留冷却名额，避免攻击者利用失败重置限流。已注册邮箱也发出不可消费的提示码邮件，以减少响应时间泄露邮箱是否存在。只有发送成功且邮箱未注册时才把验证码发布为可验证状态。需实现 Lua 或等效可靠流程，不能假设 Redis 与 PostgreSQL 存在跨库事务。
 
 注册时先原子消费验证码，再插入数据库。若数据库失败，验证码保持已消费，用户可重新获取验证码；这是明确的失败关闭恢复策略，可避免并发复用。唯一约束冲突映射为稳定业务错误 `EMAIL_ALREADY_REGISTERED`。消费验证码不是数据库事务的一部分，不做会导致凭证重用的“失败自动恢复”。
 

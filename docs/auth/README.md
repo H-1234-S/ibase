@@ -21,6 +21,6 @@
 - `.env.example` 当前仅含 PostgreSQL、Redis 和 API 端口配置。真实 `.env` 不纳入文档或版本控制内容。
 - 共享包已有 `@ibase/shared-types`，可承载前后端共用的公开用户/API 契约；实现时应先检查并按需扩展。
 
-## 评审状态
+## 实施状态
 
-请先审核本目录。尤其确认 [系统架构与安全设计](./02-architecture-security.md) 中的部署域名、Cookie/CSRF策略和 Refresh Token 并发策略，以及 [配置、实施与验收](./06-configuration-delivery.md) 中标记为待确认的产品规则。完成审核后再开始代码实现。
+认证第一版已按本文档完成实现和本地 PostgreSQL/Redis 集成验证。当前域名拓扑采用 Next.js `/api/*` 同源代理到 NestJS；Refresh Token 重放采取安全优先撤销会话策略；组织与成员关系只预留模型边界，未创建组织业务表或接口。部署到生产前仍需配置真实 JWT 密钥、QQ SMTP 授权码和公开 Origin，并评审第 6 份文档中的剩余产品策略。

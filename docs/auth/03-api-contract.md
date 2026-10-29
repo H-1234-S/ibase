@@ -26,7 +26,7 @@ API 当前全局前缀为 `/api`，所以本模块路径均包含此前缀。所
 | `POST /api/auth/refresh`         | Refresh Cookie           | 无                                                                                    | `200 { "data": { "user": <PublicUser> } }` + 轮换 Cookie               |
 | `POST /api/auth/logout`          | 当前会话（重复调用幂等） | 无                                                                                    | `204`，清除 Cookie                                                     |
 
-`/auth/email/send-code` 对已注册邮箱的行为需审核：为避免账号枚举，推荐统一返回通用成功响应，并不发送验证码；前端可在注册提交时收到 `EMAIL_ALREADY_REGISTERED`。如产品要求发信接口立即提示已注册，则该端点也会暴露枚举信息。
+`/auth/email/send-code` 对已注册邮箱也返回通用成功响应并发送不可消费的提示码邮件，以减少响应时序上的账号枚举；只有未注册邮箱的验证码会发布到 Redis。注册提交时返回 `EMAIL_ALREADY_REGISTERED`。
 
 ## 错误格式
 
@@ -59,4 +59,4 @@ API 当前全局前缀为 `/api`，所以本模块路径均包含此前缀。所
 
 ## Cookie 契约
 
-登录/注册/刷新通过 `Set-Cookie` 返回 `HttpOnly` 凭证。Access Cookie 名称与 Refresh Cookie 名称实现时固定并文档化；建议使用 `ibase_at` 与 `ibase_rt`。浏览器请求必须携带 credentials。登出和刷新失效时使用完全相同的 Path/属性清除对应 Cookie。响应 JSON 不包含 JWT。
+登录/注册/刷新通过 `Set-Cookie` 返回 `HttpOnly` 凭证。Access Cookie 使用 `ibase_at`、Path `/api`；Refresh Cookie 使用 `ibase_rt`、Path `/api/auth`，以便刷新与登出都能读取。浏览器请求必须携带 credentials。登出和刷新失效时使用完全相同的 Path/属性清除对应 Cookie。响应 JSON 不包含 JWT。

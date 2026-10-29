@@ -4,33 +4,35 @@
 
 不在文档中记录真实 `.env` 值；实现时检查变量名是否已存在并保留现有本地环境。`.env.example` 仅含占位符。
 
-| 变量                                           | 用途                  | 建议/规则                                          |
-| ---------------------------------------------- | --------------------- | -------------------------------------------------- |
-| `DATABASE_URL`                                 | PostgreSQL            | 仓库已存在；继续使用。                             |
-| `REDIS_URL`                                    | Redis                 | 仓库已存在；认证依赖不可用时失败关闭。             |
-| `API_PORT`                                     | API 监听端口          | 仓库已存在。                                       |
-| `NODE_ENV`                                     | 环境识别              | 区分开发、测试、生产。                             |
-| `WEB_ORIGIN`                                   | 精确允许的前端 Origin | 生产必填；不接受通配符。                           |
-| `API_PUBLIC_URL`                               | API 公网基址/部署文档 | 按部署需要。                                       |
-| `JWT_ACCESS_SECRET`                            | Access 签名密钥       | 强随机、生产必填。                                 |
-| `JWT_REFRESH_SECRET`                           | Refresh 签名密钥      | 与 Access 分离，生产必填。                         |
-| `JWT_ACCESS_TTL`                               | Access 有效期         | 默认 15m。                                         |
-| `JWT_REFRESH_TTL`                              | Refresh 有效期        | 默认 7d；同时受会话绝对期限约束。                  |
-| `JWT_ISSUER` / `JWT_AUDIENCE`                  | JWT 验证声明          | 所有环境显式一致。                                 |
-| `AUTH_SESSION_ABSOLUTE_TTL`                    | 会话绝对期限          | 建议 30d，待审核。                                 |
-| `AUTH_SESSION_IDLE_TTL`                        | 会话空闲期限          | 建议 7d，待审核。                                  |
-| `AUTH_COOKIE_SECURE` / `AUTH_COOKIE_SAME_SITE` | Cookie 环境策略       | 生产 secure 必须 true；SameSite 与拓扑一致。       |
-| `AUTH_COOKIE_DOMAIN`                           | 可选 Cookie Domain    | 默认不设置；不使用宽泛 Domain。                    |
-| `EMAIL_USER`                                   | QQ 邮箱/SMTP 用户     | 用户已说明配置在本地 env；实施时确认变量名。       |
-| `EMAIL_PASSWORD`                               | QQ SMTP 授权码        | 使用 SMTP 授权码，不是邮箱网页登录密码；绝不记录。 |
-| `EMAIL_FROM`                                   | 发件人                | 可配置发件名/地址。                                |
-| `AUTH_EMAIL_CODE_TTL_SECONDS`                  | 验证码 TTL            | 固定且校验为 300 秒。                              |
-| `AUTH_EMAIL_CODE_COOLDOWN_SECONDS`             | 发信冷却              | 建议 60 秒。                                       |
-| `AUTH_EMAIL_CODE_MAX_ATTEMPTS`                 | 验证尝试上限          | 建议 5 次。                                        |
-| `AUTH_EMAIL_RATE_LIMIT_*`                      | 邮箱/IP 发信额度      | 建议每邮箱 5 次/小时、每 IP 20 次/小时。           |
-| `AUTH_LOGIN_IP_RATE_LIMIT_*`                   | 登录来源限流          | 在 Argon2id 验证前检查；按 IP/网络限制请求频率。   |
-| `AUTH_LOGIN_HASH_CONCURRENCY`                  | 密码验证并发上限      | 限制昂贵 Argon2id 工作数；超限有界排队或立即 429。 |
-| `AUTH_LOGIN_RATE_LIMIT_*`                      | 登录限流              | 依据 IP + 规范化账号组合设定。                     |
+| 变量                                           | 用途                  | 建议/规则                                             |
+| ---------------------------------------------- | --------------------- | ----------------------------------------------------- |
+| `DATABASE_URL`                                 | PostgreSQL            | 仓库已存在；继续使用。                                |
+| `REDIS_URL`                                    | Redis                 | 仓库已存在；认证依赖不可用时失败关闭。                |
+| `API_PORT`                                     | API 监听端口          | 仓库已存在。                                          |
+| `NODE_ENV`                                     | 环境识别              | 区分开发、测试、生产。                                |
+| `WEB_ORIGIN`                                   | 精确允许的前端 Origin | 生产必填；不接受通配符。                              |
+| `API_BASE_URL`                                 | Next.js API rewrite   | 本地默认 `http://localhost:3001`；参与 web 构建缓存。 |
+| `API_PUBLIC_URL`                               | API 公网基址/部署文档 | 按部署需要。                                          |
+| `JWT_ACCESS_SECRET`                            | Access 签名密钥       | 强随机、生产必填。                                    |
+| `JWT_REFRESH_SECRET`                           | Refresh 签名密钥      | 与 Access 分离，生产必填。                            |
+| `JWT_ACCESS_TTL_SECONDS`                       | Access 有效期         | 默认 900 秒。                                         |
+| `JWT_REFRESH_TTL_SECONDS`                      | Refresh 有效期        | 默认 604800 秒；同时受会话绝对期限约束。              |
+| `JWT_ISSUER` / `JWT_AUDIENCE`                  | JWT 验证声明          | 所有环境显式一致。                                    |
+| `AUTH_SESSION_ABSOLUTE_TTL_SECONDS`            | 会话绝对期限          | 默认 2592000 秒。                                     |
+| `AUTH_SESSION_IDLE_TTL_SECONDS`                | 会话空闲期限          | 默认 604800 秒。                                      |
+| `AUTH_COOKIE_SECURE` / `AUTH_COOKIE_SAME_SITE` | Cookie 环境策略       | 生产 secure 必须 true；SameSite 与拓扑一致。          |
+| `AUTH_COOKIE_DOMAIN`                           | 可选 Cookie Domain    | 默认不设置；不使用宽泛 Domain。                       |
+| `EMAIL_USER`                                   | QQ 邮箱/SMTP 用户     | 用户已说明配置在本地 env；实施时确认变量名。          |
+| `EMAIL_PASSWORD`                               | QQ SMTP 授权码        | 使用 SMTP 授权码，不是邮箱网页登录密码；绝不记录。    |
+| `EMAIL_FROM`                                   | 发件人                | 可配置发件名/地址。                                   |
+| `AUTH_EMAIL_CODE_TTL_SECONDS`                  | 验证码 TTL            | 固定且校验为 300 秒。                                 |
+| `AUTH_EMAIL_CODE_COOLDOWN_SECONDS`             | 发信冷却              | 建议 60 秒。                                          |
+| `AUTH_EMAIL_CODE_MAX_ATTEMPTS`                 | 验证尝试上限          | 建议 5 次。                                           |
+| `AUTH_EMAIL_RATE_LIMIT_PER_HOUR`               | 邮箱发信额度          | 默认每邮箱 5 次/小时。                                |
+| `AUTH_IP_EMAIL_RATE_LIMIT_PER_HOUR`            | IP 发信额度           | 默认每 IP 20 次/小时。                                |
+| `AUTH_LOGIN_ACCOUNT_LIMIT`                     | 登录账号限流          | 默认每账号 10 次/15 分钟，在 Argon2id 前检查。        |
+| `AUTH_LOGIN_IP_LIMIT`                          | 登录来源限流          | 默认每 IP 30 次/15 分钟，在 Argon2id 前检查。         |
+| `AUTH_LOGIN_HASH_CONCURRENCY`                  | 密码验证并发上限      | 限制昂贵 Argon2id 工作数；超限有界排队或立即 429。    |
 
 重要：用户提供的示例出现 `Email_PASSWORD` 大小写写法，本文统一为 `EMAIL_PASSWORD`。Windows 文件系统通常不区分变量名大小写，而 Linux 区分；实现前应检查本地 `.env` 中的变量名（不打印值），必要时只改变量名而保留凭证内容。
 
@@ -92,4 +94,4 @@
 7. 是否接受安全优先的 Refresh 并发策略：跨标签尽力加锁；同一旧 token 的第二次使用视为重放并撤销当前会话，因此极端竞争时需重新登录？如需无感并发恢复，须接受有界幂等窗口带来的重放风险并单独评审。
 8. 多租户第一版是否仅预留边界而暂不创建组织/成员功能？本文建议用户是全局身份，未来通过独立 `orgs`/`members` 建模，组织内权限按服务端成员关系校验。
 
-审核通过后再进入代码实现；本轮交付仅包含这组需求和设计文档。
+实现已按本清单完成首轮验证。剩余生产上线前事项包括配置生产 Origin 与强随机 JWT 密钥、确认 QQ SMTP 授权码和实际部署拓扑，并由产品方确定文档中尚未定案的账号枚举/限流策略。
