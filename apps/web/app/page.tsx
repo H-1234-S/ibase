@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@ibase/ui/components/ui/card';
+import { AuthStatus } from '../features/auth/components/auth-status';
 
 async function getApiHealth() {
   const apiBaseUrl = process.env.API_BASE_URL ?? 'http://localhost:3001';
@@ -41,6 +42,7 @@ export default async function Home() {
           <p className="text-muted-foreground">
             查看 API 服务和数据库是否可用。
           </p>
+          <AuthStatus />
         </header>
 
         <Card>

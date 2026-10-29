@@ -1,12 +1,3 @@
-/** Response body returned by the API liveness endpoint. */
-export interface ApiLivenessResponse {
-  service: string;
-  status: 'ok';
-}
-
-/** Response body returned when the API and its required database are ready. */
-export interface ApiHealthResponse extends ApiLivenessResponse {
-  dependencies: {
-    postgresql: 'ok';
-  };
-}
+export type { ApiErrorResponse, ApiSuccess } from './api.js';
+export type { PublicUser } from './auth.js';
+export type { ApiHealthResponse, ApiLivenessResponse } from './health.js';
