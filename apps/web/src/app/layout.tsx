@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { APP_NAME } from '@ibase/constants';
+import { Toaster } from '@ibase/ui/components/ui/sonner';
 import { AuthProvider } from '../features/auth/components/auth-provider';
 import './globals.css';
 
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>{children}</AuthProvider>
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useRouter } from 'next/navigation';
 import type { PublicUser } from '@ibase/shared-types';
 import { authRequest, fetchCurrentUser } from '../api/auth-api';
 import { AuthContext } from '../context/auth-context';
@@ -15,6 +16,7 @@ import { broadcastAuthChange } from './broadcast-auth-change';
 
 /** Restores the public user from `/me` and centralizes browser auth state. */
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<PublicUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,15 +36,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     const channel = new BroadcastChannel('ibase-auth');
-    channel.onmessage = () => void reloadUser();
+    channel.onmessage = (event: MessageEvent<{ type?: string }>) => {
+      if (event.data?.type === 'logout') {
+        setUser(null);
+        router.replace('/login');
+        return;
+      }
+      void reloadUser();
+    };
     return () => channel.close();
-  }, [reloadUser]);
+  }, [reloadUser, router]);
 
   const logout = useCallback(async () => {
     await authRequest<void>('/api/auth/logout', { method: 'POST' });
     setUser(null);
-    broadcastAuthChange();
-  }, []);
+    broadcastAuthChange('logout');
+    router.replace('/login');
+  }, [router]);
 
   const value = useMemo(
     () => ({ user, loading, setUser, logout, reloadUser }),

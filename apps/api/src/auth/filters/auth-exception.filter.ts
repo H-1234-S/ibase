@@ -55,9 +55,11 @@ export class AuthExceptionFilter implements ExceptionFilter {
           message:
             typeof details.message === 'string'
               ? details.message
-              : 'Request failed',
-          ...(Array.isArray(details.message)
-            ? { fields: details.message }
+              : status === HttpStatus.BAD_REQUEST
+                ? 'Please check the submitted information'
+                : 'Request failed',
+          ...(Array.isArray(details.validationErrors)
+            ? { validationErrors: details.validationErrors }
             : {}),
           requestId,
         },
