@@ -19,6 +19,9 @@ jobs:
     timeout-minutes: 30
     env:
       DATABASE_URL: postgresql://ibase:ibase_ci@localhost:5432/ibase
+      REDIS_URL: redis://localhost:6379
+      EMAIL_USER: ci@example.invalid
+      EMAIL_PASSWORD: ci-placeholder-password
     services:
       postgres:
         image: postgres:17-alpine
@@ -32,6 +35,15 @@ jobs:
           --health-cmd "pg_isready -U ibase -d ibase"
           --health-interval 5s
           --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
           --health-retries 10
     steps:
       - name: Check out source
@@ -69,6 +81,9 @@ jobs:
 
       - name: Run API unit tests
         run: pnpm --filter api test
+
+      - name: Migrate API test database
+        run: pnpm --filter api db:migrate
 
       - name: Run API end-to-end tests
         run: pnpm --filter api test:e2e
