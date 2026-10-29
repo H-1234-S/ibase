@@ -1,6 +1,6 @@
 # API
 
-NestJS API service. It listens on port `3001` by default and reads local configuration from the repository root `.env` file.
+NestJS API service. It listens on port `3001` by default and reads local configuration from the repository root `.env` file. Set `API_PORT` to change the listening port.
 
 ## Local database setup
 
@@ -22,6 +22,8 @@ pnpm db:migrate
 ```
 
 Use `pnpm --filter api db:studio` to open Drizzle Studio.
+
+Swagger UI is available at `http://localhost:3001/api/docs` by default.
 
 ## Run the API
 

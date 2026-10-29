@@ -26,5 +26,6 @@ This block is written and re-added by `turbo` before repository-scoped commands 
 11. Do not extract one-off helper functions unless they maintain a real boundary, hide meaningful complexity, or are expected to be reused. Prefer inlining simple one-use logic.
 12. Do not revert files that are already staged in Git.
 13. Keep source files under 500 lines where practical; split them as needed to keep files short and focused. This limit does not apply to unit test files.
+14. Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
 
 <!-- GENERAL CODING GUIDELINES END -->

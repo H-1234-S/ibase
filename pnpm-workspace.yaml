@@ -3,6 +3,7 @@ packages:
   - 'packages/*'
 
 allowBuilds:
+  '@scarf/scarf': true
   '@tailwindcss/oxide': true
   esbuild: true
 
