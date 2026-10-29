@@ -21,5 +21,6 @@ import { DatabaseModule } from '../database/database.module.js';
     JwtAuthGuard,
     AuthOriginGuard,
   ],
+  exports: [AuthService, EmailService, JwtAuthGuard, AuthOriginGuard],
 })
 export class AuthModule {}

@@ -7,6 +7,7 @@ import { HealthController } from './health.controller.js';
 import { AuthModule } from './auth/auth.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { validateEnvironment } from './config/env.validation.js';
+import { OrganizationsModule } from './organizations/organizations.module.js';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { validateEnvironment } from './config/env.validation.js';
     DatabaseModule,
     RedisModule,
     AuthModule,
+    OrganizationsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

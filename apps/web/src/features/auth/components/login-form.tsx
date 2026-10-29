@@ -4,22 +4,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { Button } from '@ibase/ui/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@ibase/ui/components/ui/card';
 import { toast } from '@ibase/ui/components/ui/sonner';
-import {
-  ApiRequestError,
-  authRequest,
-  getApiErrorMessage,
-} from '../api/auth-api';
+import { ApiRequestError, authRequest } from '../api/auth-api';
+import { getApiErrorMessage } from '../api/auth-error-message';
 import { broadcastAuthChange } from './broadcast-auth-change';
 import { useAuth } from '../hooks/use-auth';
 import type { PublicUser } from '@ibase/shared-types';
+import { AuthLayout } from './auth-layout';
 
 /** Email and password login page. */
 export function LoginForm() {
@@ -78,55 +69,44 @@ export function LoginForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>登录 ibase</CardTitle>
-          <CardDescription>使用邮箱和密码登录你的账号。</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-5" onSubmit={submit}>
-            <label className="block space-y-2 text-sm font-medium">
-              邮箱
-              <input
-                autoComplete="email"
-                className="h-10 w-full rounded-md border bg-background px-3 font-normal"
-                maxLength={254}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                type="email"
-                value={email}
-              />
-            </label>
-            <label className="block space-y-2 text-sm font-medium">
-              密码
-              <input
-                autoComplete="current-password"
-                className="h-10 w-full rounded-md border bg-background px-3 font-normal"
-                maxLength={128}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                type="password"
-                value={password}
-              />
-              {passwordError && (
-                <span className="block text-sm text-destructive" role="alert">
-                  {passwordError}
-                </span>
-              )}
-            </label>
-            <Button className="w-full" disabled={busy} type="submit">
-              {busy ? '登录中…' : '登录'}
-            </Button>
-          </form>
-          <p className="mt-5 text-center text-sm text-muted-foreground">
-            还没有账号？{' '}
-            <Link className="text-primary underline" href="/register">
-              注册
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+    <AuthLayout mode="login">
+      <form className="auth-form auth-form-login" onSubmit={submit}>
+        <label className="auth-field-label">
+          邮箱
+          <input
+            autoComplete="email"
+            className="auth-input"
+            maxLength={254}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+            type="email"
+            value={email}
+          />
+        </label>
+        <label className="auth-field-label">
+          密码
+          <input
+            autoComplete="current-password"
+            className="auth-input"
+            maxLength={128}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            type="password"
+            value={password}
+          />
+          {passwordError && (
+            <span className="auth-error" role="alert">
+              {passwordError}
+            </span>
+          )}
+        </label>
+        <Button className="auth-submit" disabled={busy} type="submit">
+          {busy ? '登录中…' : '登录'}
+        </Button>
+      </form>
+      <p className="auth-switch-prompt">
+        首次使用 ibase？ <Link href="/register">创建免费账号</Link>
+      </p>
+    </AuthLayout>
   );
 }

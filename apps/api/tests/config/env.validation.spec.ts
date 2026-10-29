@@ -6,6 +6,7 @@ describe('validateEnvironment', () => {
     const environment = validateEnvironment({
       EMAIL_USER: 'test@example.com',
       EMAIL_PASSWORD: 'test-smtp-password',
+      INVITATION_TOKEN_SECRET: 'i'.repeat(32),
     });
 
     expect(environment.WEB_ORIGIN).toBe('http://localhost:3000');
@@ -40,6 +41,7 @@ describe('validateEnvironment', () => {
       EMAIL_PASSWORD: 'test-smtp-password',
       DATABASE_URL: 'postgresql://db.example/app',
       REDIS_URL: 'redis://redis.example',
+      INVITATION_TOKEN_SECRET: 'i'.repeat(32),
     };
 
     expect(() =>

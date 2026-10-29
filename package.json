@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "predev": "pnpm run db:up",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write .",
