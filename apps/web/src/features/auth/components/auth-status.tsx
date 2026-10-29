@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@ibase/ui/components/ui/button';
+import { Badge } from '@ibase/ui/components/ui/badge';
 import { useAuth } from '../hooks/use-auth';
 
 /** Shows the restored user profile or links to authentication pages. */
@@ -11,16 +12,27 @@ export function AuthStatus() {
   const [error, setError] = useState('');
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground">正在恢复登录状态…</p>;
+    return (
+      <span aria-live="polite" className="text-xs text-[var(--console-mute)]">
+        正在恢复登录状态…
+      </span>
+    );
   }
 
   if (!user) {
     return (
-      <div className="flex gap-3">
-        <Button asChild variant="outline">
+      <div className="flex items-center gap-2">
+        <Button
+          asChild
+          className="h-11 rounded-[6px] border-[var(--console-line)] bg-white px-1.5 text-sm text-[var(--console-ink)] hover:bg-[var(--console-soft)]"
+          variant="outline"
+        >
           <Link href="/login">登录</Link>
         </Button>
-        <Button asChild>
+        <Button
+          asChild
+          className="h-11 rounded-[6px] bg-[var(--console-ink)] px-1.5 text-sm text-white hover:bg-[var(--console-body)]"
+        >
           <Link href="/register">注册</Link>
         </Button>
       </div>
@@ -28,9 +40,16 @@ export function AuthStatus() {
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm">你好，{user.name}</span>
+    <div className="flex items-center gap-3">
+      <Badge
+        variant="outline"
+        className="max-w-48 truncate rounded-[6px] border-[var(--console-line)] px-2 py-1 text-xs font-normal text-[var(--console-body)]"
+        title={user.name}
+      >
+        {user.name}
+      </Badge>
       <Button
+        className="h-11 rounded-[6px] border-[var(--console-line)] bg-white px-1.5 text-sm text-[var(--console-ink)] hover:bg-[var(--console-soft)]"
         variant="outline"
         onClick={() => {
           setError('');
@@ -40,7 +59,7 @@ export function AuthStatus() {
         退出登录
       </Button>
       {error && (
-        <span className="text-sm text-destructive" role="alert">
+        <span className="text-xs text-[var(--console-error-deep)]" role="alert">
           {error}
         </span>
       )}

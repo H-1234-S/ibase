@@ -1,9 +1,7 @@
 import { ApiRequestError } from '../api/auth-api';
 
 /** Maps registration API validation rules to the corresponding form fields. */
-export function registrationFieldErrors(
-  error: ApiRequestError,
-) {
+export function registrationFieldErrors(error: ApiRequestError) {
   if (error.code !== 'VALIDATION_ERROR' || !error.validationErrors?.length) {
     return undefined;
   }

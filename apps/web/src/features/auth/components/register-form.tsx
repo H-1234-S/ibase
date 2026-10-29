@@ -73,7 +73,10 @@ export function RegisterForm() {
           error.code === 'INVALID_OR_EXPIRED_CODE'
         ) {
           setServerErrors({ code: '验证码错误或已过期，请重新获取。' });
-        } else if (error instanceof ApiRequestError && error.validationErrors?.length) {
+        } else if (
+          error instanceof ApiRequestError &&
+          error.validationErrors?.length
+        ) {
           const fieldErrors = registrationFieldErrors(error);
           if (fieldErrors) setServerErrors(fieldErrors);
         } else {

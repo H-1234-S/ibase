@@ -98,9 +98,7 @@ export function validateEnvironment(environment: Record<string, unknown>) {
     'INVITATION_TOKEN_SECRET',
   );
   if (Buffer.byteLength(invitationSecret) < 32) {
-    throw new Error(
-      'INVITATION_TOKEN_SECRET must contain at least 32 bytes',
-    );
+    throw new Error('INVITATION_TOKEN_SECRET must contain at least 32 bytes');
   }
 
   if (!['lax', 'strict', 'none'].includes(sameSite)) {

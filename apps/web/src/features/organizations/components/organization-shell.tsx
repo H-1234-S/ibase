@@ -8,6 +8,28 @@ import type {
   OrganizationSummary,
 } from '@ibase/shared-types';
 import { Button } from '@ibase/ui/components/ui/button';
+import { Badge } from '@ibase/ui/components/ui/badge';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@ibase/ui/components/ui/breadcrumb';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@ibase/ui/components/ui/alert';
+import { Skeleton } from '@ibase/ui/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@ibase/ui/components/ui/select';
 import { AuthStatus } from '../../auth/components/auth-status';
 import { organizationsApi } from '../api/organizations-api';
 import styles from './organization-shell.module.css';
@@ -59,12 +81,16 @@ export function OrganizationShell({
   if (error) {
     return (
       <main className={styles.statePage}>
-        <p className={styles.eyebrow}>Organization</p>
-        <h1 className={styles.stateTitle}>组织不可用</h1>
-        <p className={styles.stateDescription}>{error}</p>
+        <p className={styles.eyebrow}>组织工作区</p>
+        <Alert className="mt-3 border-[var(--console-line)] bg-white text-[var(--console-ink)]">
+          <AlertTitle>组织不可用</AlertTitle>
+          <AlertDescription className="text-[var(--console-body)]">
+            {error}
+          </AlertDescription>
+        </Alert>
         <div className={styles.stateActions}>
           <Button
-            className={styles.primaryButton}
+            className="h-11 rounded-[6px] bg-[var(--console-ink)] px-1.5 text-white hover:bg-[var(--console-body)]"
             onClick={() => setReloadKey((key) => key + 1)}
             type="button"
           >
@@ -80,9 +106,10 @@ export function OrganizationShell({
 
   if (!organization) {
     return (
-      <main className={styles.statePage} aria-live="polite">
-        <p className={styles.eyebrow}>Organization</p>
-        <h1 className={styles.stateTitle}>正在加载组织…</h1>
+      <main className={styles.statePage} aria-live="polite" aria-busy="true">
+        <p className={styles.eyebrow}>组织工作区</p>
+        <Skeleton className="mt-4 h-8 w-40 rounded-[6px]" />
+        <Skeleton className="mt-3 h-4 w-64 rounded-[6px]" />
       </main>
     );
   }
@@ -91,36 +118,44 @@ export function OrganizationShell({
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <Link className={styles.brand} href="/dashboard">
-          <span className={styles.brandMark}>i</span>
+          <span aria-hidden="true" className={styles.brandMark}>
+            i
+          </span>
           <span>ibase</span>
         </Link>
 
         <div className={styles.organizationPicker}>
           <span className={styles.eyebrow}>组织</span>
-          <label className={styles.selectLabel}>
-            <span className="sr-only">切换组织</span>
-            <select
-              className={styles.select}
-              value={orgId}
-              onChange={(event) => {
-                const selectedId = event.target.value;
-                window.localStorage.setItem(
-                  'ibase:last-organization',
-                  selectedId,
-                );
-                window.location.assign(`/orgs/${selectedId}/dashboard`);
-              }}
+          <Select
+            value={orgId}
+            onValueChange={(selectedId) => {
+              window.localStorage.setItem(
+                'ibase:last-organization',
+                selectedId,
+              );
+              window.location.assign(`/orgs/${selectedId}/dashboard`);
+            }}
+          >
+            <SelectTrigger
+              aria-label="切换组织"
+              className="h-11 w-full rounded-[6px] border-[var(--console-line)] bg-white text-[var(--console-ink)] shadow-none focus-visible:ring-[var(--console-blue)]"
             >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
               {organizations.map((item) => (
-                <option key={item.id} value={item.id}>
+                <SelectItem key={item.id} value={item.id}>
                   {item.name}
-                </option>
+                </SelectItem>
               ))}
-            </select>
-          </label>
-          <span className={styles.roleBadge}>
+            </SelectContent>
+          </Select>
+          <Badge
+            variant="outline"
+            className="rounded-[6px] border-[var(--console-line)] text-[var(--console-body)]"
+          >
             {organization.currentRole === 'admin' ? '管理员' : '成员'}
-          </span>
+          </Badge>
         </div>
 
         <nav className={styles.navigation} aria-label="组织导航">
@@ -133,23 +168,28 @@ export function OrganizationShell({
               const href = `/orgs/${orgId}/${item.suffix}`;
               const active = pathname === href;
               return (
-                <Link
-                  aria-current={active ? 'page' : undefined}
-                  className={`${styles.navLink}${active ? ` ${styles.activeNavLink}` : ''}`}
-                  href={href}
+                <Button
+                  asChild
+                  className={`${styles.navLink} ${active ? styles.activeNavLink : ''}`}
                   key={item.suffix}
+                  variant={active ? 'secondary' : 'ghost'}
                 >
-                  <span aria-hidden="true" className={styles.navMark} />
-                  {item.label}
-                </Link>
+                  <Link aria-current={active ? 'page' : undefined} href={href}>
+                    {item.label}
+                  </Link>
+                </Button>
               );
             })}
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <Link className={styles.createLink} href="/onboarding/organization">
-            + 创建组织
-          </Link>
+          <Button
+            asChild
+            className="h-11 rounded-[6px] border-[var(--console-line)] bg-white px-1.5 text-[var(--console-ink)] hover:bg-[var(--console-soft)]"
+            variant="outline"
+          >
+            <Link href="/onboarding/organization">创建组织</Link>
+          </Button>
           <div className={styles.account}>
             <AuthStatus />
           </div>
@@ -158,18 +198,25 @@ export function OrganizationShell({
 
       <div className={styles.mainColumn}>
         <header className={styles.topbar}>
-          <div className={styles.breadcrumbs}>
-            <span>{organization.name}</span>
-            <span aria-hidden="true">/</span>
-            <strong>
-              {navigation.find(
-                (item) => pathname === `/orgs/${orgId}/${item.suffix}`,
-              )?.label ?? '概览'}
-            </strong>
-          </div>
-          <span className={styles.topbarRole}>
-            {organization.currentRole === 'admin' ? '管理员' : '成员'}
-          </span>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href={`/orgs/${orgId}/dashboard`}>
+                    {organization.name}
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>
+                  {navigation.find(
+                    (item) => pathname === `/orgs/${orgId}/${item.suffix}`,
+                  )?.label ?? '概览'}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </header>
         <main className={styles.content}>{children}</main>
       </div>

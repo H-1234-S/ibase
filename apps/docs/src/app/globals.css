@@ -8,6 +8,18 @@ body {
   overflow-x: hidden;
 }
 
+:root {
+  --docs-canvas: #fafafa;
+  --docs-ink: #171717;
+  --docs-body: #4d4d4d;
+  --docs-mute: #8f8f8f;
+  --docs-line: #ebebeb;
+}
+
+body {
+  background: var(--docs-canvas);
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
