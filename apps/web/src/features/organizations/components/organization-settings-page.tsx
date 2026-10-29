@@ -55,7 +55,7 @@ export function OrganizationSettingsPage({ orgId }: { orgId: string }) {
       await organizationsApi.remove(orgId);
       window.localStorage.removeItem('ibase:last-organization');
       toast.success('组织已删除');
-      router.replace('/dashboard');
+      router.replace('/orgs');
     } catch {
       toast.error('组织删除失败。请确认管理员权限。');
       setBusy(false);

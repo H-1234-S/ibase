@@ -22,6 +22,7 @@ import { Skeleton } from '@ibase/ui/components/ui/skeleton';
 import { useAuth } from '../../auth/hooks/use-auth';
 import { ApiRequestError } from '../../auth/api/auth-api';
 import { organizationsApi } from '../api/organizations-api';
+import { organizationRoutes } from '../routes';
 
 /** Reviews an organization invitation and accepts it for the signed-in user. */
 export function InvitationPage({ token }: { token: string }) {
@@ -55,7 +56,7 @@ export function InvitationPage({ token }: { token: string }) {
     setError('');
     try {
       const result = await organizationsApi.accept(token);
-      router.replace(`/orgs/${result.organizationId}/dashboard`);
+      router.replace(organizationRoutes.home(result.organizationId));
     } catch (cause) {
       if (
         cause instanceof ApiRequestError &&

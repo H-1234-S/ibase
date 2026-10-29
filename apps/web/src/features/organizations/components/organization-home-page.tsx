@@ -21,10 +21,11 @@ import {
 } from '@ibase/ui/components/ui/card';
 import { Skeleton } from '@ibase/ui/components/ui/skeleton';
 import { organizationsApi } from '../api/organizations-api';
+import { organizationRoutes } from '../routes';
 import { OrganizationPageHeader } from './organization-page-header';
 
-/** Shows organization metrics, members, and role-appropriate management links. */
-export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
+/** Shows the organization home, project entry point, metrics, and team. */
+export function OrganizationHomePage({ orgId }: { orgId: string }) {
   const [organization, setOrganization] = useState<OrganizationDetails | null>(
     null,
   );
@@ -45,7 +46,7 @@ export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
         setMembers(organizationMembers);
       })
       .catch(() => {
-        if (active) setError('组织概览暂时无法加载。');
+        if (active) setError('组织主页暂时无法加载。');
       });
     return () => {
       active = false;
@@ -56,7 +57,7 @@ export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
     return (
       <Alert className="rounded-[12px] border-[var(--console-line)] bg-white p-6 text-[var(--console-ink)]">
         <AlertTitle className="text-[20px] leading-7 tracking-[-0.4px]">
-          无法加载组织概览
+          无法加载组织主页
         </AlertTitle>
         <AlertDescription className="mt-2 text-sm leading-5 text-[var(--console-body)]">
           {error}
@@ -87,19 +88,19 @@ export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
 
   const managementLinks = [
     {
-      href: `/orgs/${orgId}/members`,
+      href: organizationRoutes.members(orgId),
       title: '成员',
       description: '查看团队成员及其组织角色。',
     },
     ...(organization.currentRole === 'admin'
       ? [
           {
-            href: `/orgs/${orgId}/invitations`,
+            href: organizationRoutes.invitations(orgId),
             title: '邀请',
             description: '邀请同事加入当前组织。',
           },
           {
-            href: `/orgs/${orgId}/settings`,
+            href: organizationRoutes.settings(orgId),
             title: '设置',
             description: '管理组织的危险操作。',
           },
@@ -110,16 +111,16 @@ export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
   return (
     <div>
       <OrganizationPageHeader
-        eyebrow="组织概览"
+        eyebrow="组织主页"
         title={organization.name}
-        description="在这里查看组织成员和管理入口。"
+        description="管理组织项目、成员和访问权限。"
         action={
           organization.currentRole === 'admin' ? (
             <Button
               asChild
               className="h-11 rounded-[6px] bg-[var(--console-ink)] px-1.5 text-sm text-white hover:bg-[var(--console-body)]"
             >
-              <Link href={`/orgs/${orgId}/invitations`}>邀请成员</Link>
+              <Link href={organizationRoutes.invitations(orgId)}>邀请成员</Link>
             </Button>
           ) : undefined
         }
@@ -152,6 +153,32 @@ export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
         </Card>
       </section>
 
+      <section className="mt-8">
+        <Card className="rounded-[12px] border-[var(--console-line)] bg-white shadow-none">
+          <CardHeader className="flex-row items-center justify-between gap-4 space-y-0 p-6">
+            <div>
+              <CardTitle className="text-[20px] font-semibold leading-7 tracking-[-0.4px]">
+                项目
+              </CardTitle>
+              <p className="mt-1 text-sm leading-5 text-[var(--console-body)]">
+                组织中的 BaaS 应用和环境
+              </p>
+            </div>
+            <Link
+              className="text-sm text-[var(--console-body)] underline underline-offset-4"
+              href={organizationRoutes.projects(orgId)}
+            >
+              打开项目
+            </Link>
+          </CardHeader>
+          <CardContent className="border-t border-[var(--console-line)] p-6">
+            <p className="text-sm leading-5 text-[var(--console-mute)]">
+              项目创建与管理服务接入后，项目会显示在此组织工作区。
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
         <Card className="rounded-[12px] border-[var(--console-line)] bg-white shadow-none">
           <CardHeader className="flex-row items-center justify-between gap-4 space-y-0 p-6">
@@ -160,7 +187,7 @@ export function OrganizationDashboardPage({ orgId }: { orgId: string }) {
             </CardTitle>
             <Link
               className="text-sm text-[var(--console-body)] underline underline-offset-4"
-              href={`/orgs/${orgId}/members`}
+              href={organizationRoutes.members(orgId)}
             >
               查看全部
             </Link>
