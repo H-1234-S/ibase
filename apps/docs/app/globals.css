@@ -1,3 +1,4 @@
+@import 'tailwindcss';
 @import '@ibase/ui/styles/globals.css';
 @source '../../../packages/ui/src';
 

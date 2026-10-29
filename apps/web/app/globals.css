@@ -1,37 +1,3 @@
+@import 'tailwindcss';
 @import '@ibase/ui/styles/globals.css';
 @source '../../../packages/ui/src';
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.imgDark {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-
-  .imgLight {
-    display: none;
-  }
-
-  .imgDark {
-    display: unset;
-  }
-}
