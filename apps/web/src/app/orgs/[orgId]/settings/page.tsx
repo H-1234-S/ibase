@@ -1,4 +1,4 @@
-import { OrganizationSettingsPage } from '../../../../features/organizations/components/organization-settings-page';
+import { OrgSettingsPage } from '../../../../features/organizations/components/org-settings-page';
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  return <OrganizationSettingsPage orgId={orgId} />;
+  return <OrgSettingsPage orgId={orgId} />;
 }

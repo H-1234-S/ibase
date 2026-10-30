@@ -1,5 +1,5 @@
-import { OrganizationListPage } from '../../features/organizations/components/organization-list-page';
+import { OrgListPage } from '../../features/organizations/components/org-list-page';
 
 export default function Page() {
-  return <OrganizationListPage />;
+  return <OrgListPage />;
 }

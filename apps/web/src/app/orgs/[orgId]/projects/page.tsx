@@ -1,5 +1,5 @@
-import { OrganizationProjectsPage } from '../../../../features/organizations/components/organization-projects-page';
+import { OrgProjectsListPage } from '../../../../features/organizations/components/org-projects-list-page';
 
 export default function Page() {
-  return <OrganizationProjectsPage />;
+  return <OrgProjectsListPage />;
 }

@@ -1,4 +1,4 @@
-import { OrganizationInvitationsPage } from '../../../../features/organizations/components/organization-invitations-page';
+import { OrgInvitationsPage } from '../../../../features/organizations/components/org-invitations-page';
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  return <OrganizationInvitationsPage orgId={orgId} />;
+  return <OrgInvitationsPage orgId={orgId} />;
 }

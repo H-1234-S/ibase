@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import type { OrganizationDetails, OrganizationSummary } from '@ibase/shared-types';
+import type {
+  OrganizationDetails,
+  OrganizationSummary,
+} from '@ibase/shared-types';
 import { organizationsApi } from '../api/organizations-api';
 import {
   ArrowLeftIcon,
@@ -11,6 +14,7 @@ import {
   ChartIcon,
   ChevronDownIcon,
   DatabaseIcon,
+  FolderIcon,
   GridIcon,
   KeyIcon,
   MailIcon,
@@ -21,6 +25,7 @@ import {
 
 const orgNav = [
   { key: '', label: '概览', Icon: GridIcon },
+  { key: 'projects', label: '项目', Icon: FolderIcon },
   { key: 'members', label: '成员', Icon: UsersIcon },
   { key: 'invitations', label: '邀请', Icon: MailIcon },
   { key: 'settings', label: '设置', Icon: SlidersIcon },
@@ -69,8 +74,7 @@ export function OrgConsoleShell({
       return pathname === base;
     }
     return (
-      pathname === `${base}/${key}` ||
-      pathname.startsWith(`${base}/${key}/`)
+      pathname === `${base}/${key}` || pathname.startsWith(`${base}/${key}/`)
     );
   };
   const initial = (org?.name ?? orgId).slice(0, 1).toUpperCase();

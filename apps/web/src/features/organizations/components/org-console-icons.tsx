@@ -2,10 +2,7 @@
 
 type IconProps = { className?: string };
 
-function svg(
-  className: string | undefined,
-  children: React.ReactNode,
-) {
+function svg(className: string | undefined, children: React.ReactNode) {
   return (
     <svg
       className={className}
@@ -93,10 +90,7 @@ export function BoxIcon({ className }: IconProps) {
 }
 
 export function ZapIcon({ className }: IconProps) {
-  return svg(
-    className,
-    <path d="M8.5 1.5 3.5 9h4l-1 5.5L11.5 7h-4l1-5.5Z" />,
-  );
+  return svg(className, <path d="M8.5 1.5 3.5 9h4l-1 5.5L11.5 7h-4l1-5.5Z" />);
 }
 
 export function KeyIcon({ className }: IconProps) {
@@ -121,19 +115,45 @@ export function ChevronDownIcon({ className }: IconProps) {
 }
 
 export function ArrowRightIcon({ className }: IconProps) {
-  return svg(
-    className,
-    <path d="M2.5 8h11M9.5 4l4 4-4 4" />,
-  );
+  return svg(className, <path d="M2.5 8h11M9.5 4l4 4-4 4" />);
 }
 
 export function ArrowLeftIcon({ className }: IconProps) {
-  return svg(
-    className,
-    <path d="M13.5 8h-11M6.5 4l-4 4 4 4" />,
-  );
+  return svg(className, <path d="M13.5 8h-11M6.5 4l-4 4 4 4" />);
 }
 
 export function PlusIcon({ className }: IconProps) {
   return svg(className, <path d="M8 3v10M3 8h10" />);
+}
+
+export function FolderIcon({ className }: IconProps) {
+  return svg(
+    className,
+    <path d="M2 4.25A1.25 1.25 0 0 1 3.25 3h3.1l1.4 2h5A1.25 1.25 0 0 1 14 6.25v6.5A1.25 1.25 0 0 1 12.75 14h-9.5A1.25 1.25 0 0 1 2 12.75v-8.5Z" />,
+  );
+}
+
+export function TrashIcon({ className }: IconProps) {
+  return svg(
+    className,
+    <>
+      <path d="M2.5 4.5h11M6.5 4.5V3.4a.9.9 0 0 1 .9-.9h1.2a.9.9 0 0 1 .9.9v1.1" />
+      <path d="M4 4.5l.65 8.05a1 1 0 0 0 1 .95h4.7a1 1 0 0 0 1-.95L11 4.5" />
+      <path d="M6.7 7v4M9.3 7v4" />
+    </>,
+  );
+}
+
+export function RefreshIcon({ className }: IconProps) {
+  return svg(
+    className,
+    <>
+      <path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89" />
+      <path d="M13.5 2.8v2.7h-2.7" />
+    </>,
+  );
+}
+
+export function XIcon({ className }: IconProps) {
+  return svg(className, <path d="m4 4 8 8M12 4l-8 8" />);
 }
