@@ -1,4 +1,4 @@
-import { OrganizationShell } from '../../../features/organizations/components/organization-shell';
+import { OrgConsoleShell } from '../../../features/organizations/components/org-console-shell';
 
 export default async function OrganizationLayout({
   children,
@@ -8,5 +8,5 @@ export default async function OrganizationLayout({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  return <OrganizationShell orgId={orgId}>{children}</OrganizationShell>;
+  return <OrgConsoleShell orgId={orgId}>{children}</OrgConsoleShell>;
 }

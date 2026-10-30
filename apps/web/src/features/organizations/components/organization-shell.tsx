@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import type {
   OrganizationDetails,
@@ -32,13 +33,15 @@ import {
 } from '@ibase/ui/components/ui/select';
 import { AuthStatus } from '../../auth/components/auth-status';
 import { organizationsApi } from '../api/organizations-api';
+import { organizationRoutes } from '../routes';
 import styles from './organization-shell.module.css';
 
 const navigation = [
-  { label: '概览', suffix: 'dashboard' },
-  { label: '成员', suffix: 'members' },
-  { label: '邀请', suffix: 'invitations', adminOnly: true },
-  { label: '设置', suffix: 'settings', adminOnly: true },
+  { label: '主页', path: organizationRoutes.home },
+  { label: '项目', path: organizationRoutes.projects },
+  { label: '成员', path: organizationRoutes.members },
+  { label: '邀请', path: organizationRoutes.invitations, adminOnly: true },
+  { label: '设置', path: organizationRoutes.settings, adminOnly: true },
 ];
 
 /** Loads and displays the server-verified organization context for org routes. */
@@ -50,6 +53,7 @@ export function OrganizationShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [organization, setOrganization] = useState<OrganizationDetails | null>(
     null,
   );
@@ -96,7 +100,7 @@ export function OrganizationShell({
           >
             重试
           </Button>
-          <Link className={styles.textLink} href="/dashboard">
+          <Link className={styles.textLink} href="/orgs">
             返回组织列表
           </Link>
         </div>
@@ -117,7 +121,7 @@ export function OrganizationShell({
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/dashboard">
+        <Link className={styles.brand} href="/orgs">
           <span aria-hidden="true" className={styles.brandMark}>
             i
           </span>
@@ -133,7 +137,7 @@ export function OrganizationShell({
                 'ibase:last-organization',
                 selectedId,
               );
-              window.location.assign(`/orgs/${selectedId}/dashboard`);
+              router.push(organizationRoutes.home(selectedId));
             }}
           >
             <SelectTrigger
@@ -165,13 +169,13 @@ export function OrganizationShell({
               (item) => !item.adminOnly || organization.currentRole === 'admin',
             )
             .map((item) => {
-              const href = `/orgs/${orgId}/${item.suffix}`;
+              const href = item.path(orgId);
               const active = pathname === href;
               return (
                 <Button
                   asChild
                   className={`${styles.navLink} ${active ? styles.activeNavLink : ''}`}
-                  key={item.suffix}
+                  key={href}
                   variant={active ? 'secondary' : 'ghost'}
                 >
                   <Link aria-current={active ? 'page' : undefined} href={href}>
@@ -202,7 +206,7 @@ export function OrganizationShell({
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href={`/orgs/${orgId}/dashboard`}>
+                  <Link href={organizationRoutes.home(orgId)}>
                     {organization.name}
                   </Link>
                 </BreadcrumbLink>
@@ -210,9 +214,8 @@ export function OrganizationShell({
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  {navigation.find(
-                    (item) => pathname === `/orgs/${orgId}/${item.suffix}`,
-                  )?.label ?? '概览'}
+                  {navigation.find((item) => pathname === item.path(orgId))
+                    ?.label ?? '主页'}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>

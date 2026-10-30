@@ -1,5 +1,5 @@
-import { DashboardPage } from '../../features/organizations/components/dashboard-page';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return <DashboardPage />;
+  redirect('/orgs');
 }

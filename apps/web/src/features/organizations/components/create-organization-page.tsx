@@ -16,6 +16,7 @@ import { Input } from '@ibase/ui/components/ui/input';
 import { toast } from '@ibase/ui/components/ui/sonner';
 import { ApiRequestError } from '../../auth/api/auth-api';
 import { organizationsApi } from '../api/organizations-api';
+import { organizationRoutes } from '../routes';
 
 /** Creates an organization and routes its owner to the new workspace. */
 export function CreateOrganizationPage() {
@@ -37,7 +38,7 @@ export function CreateOrganizationPage() {
     try {
       const organization = await organizationsApi.create(normalizedName);
       toast.success('组织已创建');
-      router.replace(`/orgs/${organization.id}/dashboard`);
+      router.replace(organizationRoutes.home(organization.id));
     } catch (cause) {
       setError(
         cause instanceof ApiRequestError &&
@@ -55,7 +56,7 @@ export function CreateOrganizationPage() {
       <div className="mx-auto w-full max-w-3xl">
         <Link
           className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--console-ink)] no-underline"
-          href="/dashboard"
+          href="/orgs"
         >
           <span
             aria-hidden="true"

@@ -60,7 +60,7 @@ export function ServiceUnavailablePage() {
               asChild
               className="h-11 rounded-[6px] bg-[var(--console-ink)] px-1.5 text-sm text-white hover:bg-[var(--console-body)]"
             >
-              <Link href="/dashboard">重试连接</Link>
+              <Link href="/orgs">重试连接</Link>
             </Button>
             <Button
               asChild

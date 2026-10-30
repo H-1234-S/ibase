@@ -71,7 +71,7 @@ export async function HomePage() {
               asChild
               className="h-11 rounded-[6px] bg-[var(--console-ink)] px-1.5 text-sm text-white hover:bg-[var(--console-body)]"
             >
-              <Link href="/dashboard">打开工作区</Link>
+              <Link href="/orgs">打开工作区</Link>
             </Button>
             <Button
               asChild

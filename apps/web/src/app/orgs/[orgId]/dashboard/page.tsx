@@ -1,4 +1,4 @@
-import { OrganizationDashboardPage } from '../../../../features/organizations/components/organization-dashboard-page';
+import { redirect } from 'next/navigation';
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  return <OrganizationDashboardPage orgId={orgId} />;
+  redirect(`/orgs/${orgId}`);
 }
