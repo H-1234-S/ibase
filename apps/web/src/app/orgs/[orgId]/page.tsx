@@ -1,4 +1,4 @@
-import { OrganizationHomePage } from '../../../features/organizations/components/organization-home-page';
+import { OrgProjectsOverviewPage } from '../../../features/organizations/components/org-projects-overview-page';
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  return <OrganizationHomePage orgId={orgId} />;
+  return <OrgProjectsOverviewPage orgId={orgId} />;
 }
